@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yisimeans.mapper.EmployeeMapper">
+
+    <!--分頁查詢員工-->
+    <select id="queryAll" resultType="com.yisimeans.pojo.Employee">
+        select e.*, d.name departmentName from employee e left join department d on e.department_id = d.id
+        <where>
+            <if test="name != null and name != ''">
+                e.name like concat('%', #{name}, '%')
+            </if>
+            <if test="gender != null">
+                and e.gender = #{gender}
+            </if>
+            <if test="begin != null and end != null">
+                and e.start_date between #{begin} and #{end}
+            </if>
+        </where>
+        order by start_date desc
+    </select>
+
+    <!--批量刪除員工-->
+    <delete id="deleteByIds">
+        delete from employee where id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+    </delete>
+
+    <!--根據ID查詢員工-->
+    <select id="queryById" resultMap="employeeResultMap">
+        select e.*,
+               c.id c_id,
+               c.name c_name,
+               c.issue_date c_issue_date,
+               c.expiration_date c_expiration_date,
+               c.employee_id c_employee_id
+        from employee e left join certificates c on e.id = c.employee_id where e.id = #{id}
+    </select>
+
+    <!--定義employeeResultMap手動封装查詢結果-->
+    <resultMap id="employeeResultMap" type="com.yisimeans.pojo.Employee">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="gender" property="gender"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="birthday" property="birthday"/>
+        <result column="address" property="address"/>
+        <result column="salary" property="salary"/>
+        <result column="department_id" property="departmentId"/>
+        <result column="position" property="position"/>
+        <result column="start_date" property="startDate"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+
+        <!--封装證照查詢結果-->
+        <collection property="certificatesList" ofType="com.yisimeans.pojo.Certificates">
+            <id column="c_id" property="id"/>
+            <result column="c_name" property="name"/>
+            <result column="c_issue_date" property="issueDate"/>
+            <result column="c_expiration_date" property="expirationDate"/>
+            <result column="c_employee_id" property="employeeId"/>
+        </collection>
+    </resultMap>
+
+    <!--更新員工-->
+    <update id="updateEmployee">
+        update employee
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="username != null and username != ''">
+                username = #{username},
+            </if>
+            <if test="password != null and password != ''">
+                password = #{password},
+            </if>
+            <if test="gender != null">
+                gender = #{gender},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="email != null and email != ''">
+                email = #{email},
+            </if>
+            <if test="birthday != null">
+                birthday = #{birthday},
+            </if>
+            <if test="address != null and address != ''">
+                address = #{address},
+            </if>
+            <if test="salary != null or salary == null">
+                salary = #{salary},
+            </if>
+            <if test="departmentId != null or departmentId == null">
+                department_id = #{departmentId},
+            </if>
+            <if test="position != null or position == null">
+                position = #{position},
+            </if>
+            <if test="startDate != null">
+                start_date = #{startDate},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--查詢員工職位統計人數-->
+    <select id="getEmployeePosition" resultType="java.util.Map">
+        select
+            (case when position = 1 then '經理'
+                  when position = 2 then '主管'
+                  when position = 3 then '專員'
+                  when position = 4 then '助理'
+                  when position = 5 then '實習生'
+                  else '其他' end) position,
+            count(*) total
+        from employee group by position order by total
+    </select>
+
+    <!--查詢員工性別統計人數-->
+    <select id="getEmployeeGender" resultType="java.util.Map">
+        select
+            if(gender = 1, '男性', '女性') name,
+            count(*) value
+        from employee group by gender
+    </select>
+</mapper>

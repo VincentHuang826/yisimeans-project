@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yisimeans.mapper.CertificatesMapper">
+
+    <!--新增員工證照-->
+    <insert id="addCertificates">
+        insert into certificates(name, issue_date, expiration_date, employee_id) VALUES
+            <foreach collection="certificatesList" item="cer" separator=",">
+                (#{cer.name}, #{cer.issueDate}, #{cer.expirationDate}, #{cer.employeeId})
+            </foreach>
+    </insert>
+
+    <!--刪除員工證照-->
+    <delete id="deleteByEmployeeIds">
+        delete from certificates where employee_id in
+            <foreach collection="employeeIds" item="empId" separator="," open="(" close=")">
+                #{empId}
+            </foreach>
+    </delete>
+</mapper>

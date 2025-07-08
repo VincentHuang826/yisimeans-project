@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: yisimeans-web
+  # 配置資料庫的連接信息
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/yisimeans
+    username: root
+    password: password
+
+# 配置mybatis
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # 開啟駝峰命名映射
+    map-underscore-to-camel-case: true

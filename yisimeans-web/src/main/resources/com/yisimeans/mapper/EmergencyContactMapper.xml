@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yisimeans.mapper.EmergencyContactMapper">
+
+    <!--新增緊急聯絡人-->
+    <insert id="addContactList">
+        insert into emergency_contact(name, phone, relation, student_id) VALUES
+        <foreach collection="list" item="e" separator=",">
+            (#{e.name}, #{e.phone}, #{e.relation}, #{e.studentId})
+        </foreach>
+    </insert>
+
+    <!--刪除緊急聯絡人-->
+    <delete id="deleteById">
+        delete from emergency_contact where student_id in
+        <foreach collection="ids" item="studentId" separator="," open="(" close=")">
+            #{studentId}
+        </foreach>
+    </delete>
+</mapper>

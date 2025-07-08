@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yisimeans.mapper.StudentMapper">
+
+    <!--查詢學生列表 - 分頁查詢-->
+    <select id="queryAll" resultType="com.yisimeans.pojo.Student">
+        select s.*, c.name clazzName from student s left join clazz c on s.clazz_id = c.id
+        <where>
+            <if test="name != null and name != ''">
+                s.name like concat('%', #{name}, '%')
+            </if>
+            <if test="number != null and number != ''">
+                and s.number = #{number}
+            </if>
+            <if test="clazzId != null">
+                and s.clazz_id = #{clazzId}
+            </if>
+        </where>
+    </select>
+
+    <!--根據id查詢學生-->
+    <select id="queryById" resultMap="studentResultMap">
+        select
+            s.*,
+            e.id e_id,
+            e.name e_name,
+            e.phone e_phone,
+            e.relation e_relation,
+            e.student_id e_student_id
+        from student s left join emergency_contact e on s.id = e.student_id
+        where s.id = #{id};
+    </select>
+
+    <resultMap id="studentResultMap" type="com.yisimeans.pojo.Student">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="number" property="number"/>
+        <result column="gender" property="gender"/>
+        <result column="phone" property="phone"/>
+        <result column="birthday" property="birthday"/>
+        <result column="address" property="address"/>
+        <result column="clazz_id" property="clazzId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+
+        <collection property="emergencyContactList" ofType="com.yisimeans.pojo.EmergencyContact">
+            <id column="e_id" property="id"/>
+            <result column="e_name" property="name"/>
+            <result column="e_phone" property="phone"/>
+            <result column="e_relation" property="relation"/>
+            <result column="e_student_id" property="studentId"/>
+        </collection>
+    </resultMap>
+
+    <!--更新學生-->
+    <update id="updateStudent">
+        update student
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="number != null and number != ''">
+                number = #{number},
+            </if>
+            <if test="gender != null">
+                gender = #{gender},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="birthday != null">
+                birthday = #{birthday},
+            </if>
+            <if test="address != null and address != ''">
+                address = #{address},
+            </if>
+            <if test="clazzId != null">
+                clazz_id = #{clazzId},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--批量刪除學生-->
+    <delete id="deleteByIds">
+        delete from student where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--查詢學生性別統計人數-->
+    <select id="getStudentGender" resultType="java.util.Map">
+        select
+            if(gender = 1, '男性', '女性') name,
+            count(*) value
+        from student group by gender
+    </select>
+</mapper>

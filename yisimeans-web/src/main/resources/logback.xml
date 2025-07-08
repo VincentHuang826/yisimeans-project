@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- 設定日誌的格式 -->
+    <!-- %d{yyyy-MM-dd HH:mm:ss:SS}年-月-日 時:分:秒:毫秒 [%thread]線程名稱 %-5level日誌級別，左對齊，佔5個字符
+    %logger{50}記錄日誌的類名，最多顯示50個字符 -純文本分隔符 %msg實際的日誌消息內容  %n換行符-->
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n"/>
+
+    <!-- 設定日誌儲存路徑 -->
+    <property name="LOG_PATH" value="/Users/vincenthuang/Documents/develop/JAVA-Apps/JavaLog"/>
+
+    <!-- 控制台輸出 (ConsoleAppender) -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 檔案輸出 (RollingFileAppender) -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--<file>${LOG_PATH}/application.log</file>-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日誌文件輸出名,%i表示序號-->
+            <fileNamePattern>${LOG_PATH}/yisimeans-%d{yyyy-MM-dd}_%i.log</fileNamePattern>
+            <!--最多保留的歷史日誌文件數量-->
+            <maxHistory>30</maxHistory>
+            <!--每個日誌文件的大小上限-->
+            <MaxFileSize>10MB</MaxFileSize>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 設定不同 logger 的級別 -->
+    <!--<logger name="com.example" level="DEBUG" />
+    <logger name="org.springframework" level="INFO" />
+    <logger name="org.hibernate" level="WARN" />-->
+
+    <!-- 設定 root logger，輸出到控制台與檔案 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </root>
+
+</configuration>
